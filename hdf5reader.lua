@@ -2,7 +2,7 @@ require 'hdf5'
 local class = require 'class'
 require 'torch'
 require 'math'
---require 'cutorch'
+require 'cutorch'
 
 local threads = require 'threads'
 --local status, tds = pcall(require, 'tds')
@@ -87,14 +87,14 @@ function AsyncReader:__init(params)
     self.data_tensors[i] = torch.Tensor(self.bs, self.dataSize[self.cha_dim],
                                                  self.dataSize[self.h_dim],
                                                  self.dataSize[self.w_dim])
-    self.data_pointers[i] = tonumber(torch.data(self.data_tensors[i], true))
     self.label_tensors[i] = torch.Tensor(self.bs, self.labelSize[2])
-    self.label_pointers[i] = tonumber(torch.data(self.label_tensors[i], true))
     -- Allocate memory in GPU
     if self.cuda then
-        self.data_pointers[i]:cuda()
-        self.label_pointers[i]:cuda()
+        self.data_tensors[i]:cuda()
+        self.label_tensors[i]:cuda()
     end
+    self.data_pointers[i] = tonumber(torch.data(self.data_tensors[i], true))
+    self.label_pointers[i] = tonumber(torch.data(self.label_tensors[i], true))
   end
   -- START THREADING POOL
   self.pool = threads.Threads(

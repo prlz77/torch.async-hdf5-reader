@@ -1,5 +1,6 @@
 require 'hdf5'
 require 'hdf5reader'
+require 'cutorch'
 function test()
   -- Create fake data
   local labels = torch.linspace(1,5,5):view(5,1)
@@ -28,7 +29,7 @@ function test()
   -- Instantiate hdf5 reader
   local params = {}
   params.batchSize = 2
-  params.cuda = false
+  params.cuda = true
   params.hdf5_path = 'tmp.h5'
   params.data_field = 'data'
   params.labels_field = 'labels'
@@ -39,8 +40,8 @@ function test()
   params.shuffle = false
   ar = AsyncReader(params)
   assert( not ar:fetchData() )
-  --data:cuda()
-  --labels:cuda()
+  data:cuda()
+  labels:cuda()
   print('Checking results...')
   data2, labels2 = ar:getNextBatch()
   assert( ar:fetchData() )
